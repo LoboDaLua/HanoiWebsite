@@ -32,7 +32,8 @@
             </div>
         </div>
         <div class="game-area" id="game-area"></div>
-        <div class="tooltip" id="tooltip" role="tooltip" aria-live="polite"></div> <!-- Added -->
+        <!-- Only the game state label remains -->
+        <div id="game-state-label" class="game-state-label" role="status" aria-live="polite">Make a move to start the game.</div>
     </div>
 
     <button class="menu-toggle" id="menu-toggle">
@@ -73,14 +74,7 @@
                 <span class="slider round"></span>
             </label>
         </div>
-        <!-- Added Tooltip Setting -->
-        <div class="setting">
-            <label for="tooltip-toggle">Show Tooltips</label>
-            <label class="switch">
-                <input type="checkbox" id="tooltip-toggle" checked> <!-- Checked by default -->
-                <span class="slider round"></span>
-            </label>
-        </div>
+        <!-- Removed Tooltip Setting -->
 
         <hr>
 
@@ -103,8 +97,8 @@
         </div>
     </div>
 
-    <!-- Link to the JavaScript file in the js/ folder -->
-    <script src="js/script.js"></script>
+    <!-- Load the main entry point as a module -->
+    <script type="module" src="js/main.js"></script>
 </body>
 
 </html>

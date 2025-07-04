@@ -16,8 +16,6 @@
     --switch-bg-color: #ccc;
     --switch-active-bg-color: #2ecc71;
     --key-select-color: #f1c40f;
-    --tooltip-bg-color: #34495e;
-    --tooltip-text-color: #ecf0f1;
 }
 
 body[data-theme="dark"] {
@@ -29,8 +27,6 @@ body[data-theme="dark"] {
     --border-color: #555;
     --disk-border-color: rgba(255, 255, 255, 0.15);
     --switch-bg-color: #555;
-    --tooltip-bg-color: #ecf0f1;
-    --tooltip-text-color: #2c3e50;
 }
 
 body {
@@ -175,21 +171,21 @@ body.numbers-on-hover .disk:not(:hover) .disk-number {
 }
 
 /* --- Tooltip --- */
-.tooltip {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: var(--tooltip-bg-color);
-    color: var(--tooltip-text-color);
-    border-radius: var(--border-radius);
-    font-weight: bold;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-}
 
-.tooltip.visible {
-    opacity: 1;
-    visibility: visible;
+
+.game-state-label {
+    display: block;
+    margin: 16px 0 0 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--text-color); /* Use text-color or tooltip-text-color */
+    background: var(--panel-bg); /* Use panel-bg or tooltip-bg-color */
+    border-radius: var(--border-radius);
+    padding: 8px 16px;
+    box-shadow: var(--shadow);
+    min-height: 1.5em;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
 }
 
 

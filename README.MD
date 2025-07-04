@@ -11,7 +11,7 @@ A web-based implementation of the classic Tower of Hanoi puzzle, built with HTML
 - Dark mode toggle
 - Option to show/hide disk numbers
 - Settings persistence using browser cookies
-- Tooltips for guidance (can be toggled)
+- Game state label providing descriptive feedback for actions.
 - Timer and move counter
 
 ## Technologies Used
@@ -41,16 +41,18 @@ You can easily run this project locally using Python's built-in HTTP server.
     http://localhost:8000/
     ```
 
-> **Note:**  
+> **Note:**
 > Do not open `index.html` directly with your browser (`file://` URL), as some features (like cookies for settings) may not work. Always use a local web server as shown above.
 
 ## How to Play
 
 - **Drag and Drop:** Click and drag the top disk from a tower to another tower. Only smaller disks can be placed on larger ones.
-- **Keyboard Controls:**  
+- **Keyboard Controls:**
   - Press a number key (1, 2, 3, ...) to pick up the top disk from that tower.
   - Press another number key to place the disk on the chosen tower.
-- **Settings:**  
-  Click the hamburger menu (top right) to open settings. Here you can adjust sound, dark mode, disk number display, tooltips, and the number of disks/towers. Settings are saved automatically.
-- **Reset:**  
+- **Game State Label:**
+  Located below the game area, this label provides feedback on your actions, such as selecting a disk, attempting a move, or winning the game.
+- **Settings:**
+  Click the hamburger menu (top right) to open settings. Here you can adjust sound, dark mode, disk number display, and the number of disks/towers. Settings are saved automatically to your browser's cookies.
+- **Reset:**
   Use the "Reset" button for a quick reset, or "Apply and Reset" in the settings menu to change disk/tower count and restart.
