@@ -16,8 +16,7 @@ export const resetButton = document.getElementById('reset-btn');
 export const quickResetBtn = document.getElementById('quick-reset-btn');
 export const darkModeToggle = document.getElementById('dark-mode-toggle');
 export const showNumbersToggle = document.getElementById('show-numbers-toggle');
-export const hoverNumbersToggle = document.getElementById('hover-numbers-toggle');
-export const hoverSetting = document.getElementById('hover-setting');
+// Removed hoverNumbersToggle and hoverSetting
 export const soundToggle = document.getElementById('sound-toggle');
 export const volumeControl = document.getElementById('volume-control');
 export const volumeValue = document.getElementById('volume-value');
@@ -38,19 +37,15 @@ export function setGameStateLabel(msg) {
     if (gameStateLabel) gameStateLabel.textContent = msg || '';
 }
 
+
 export function applyTheme(isDark) {
     document.body.dataset.theme = isDark ? 'dark' : 'light';
 }
 
 export function applyNumberDisplaySetting(showNumbers) {
-     document.body.classList.toggle('numbers-hidden', !showNumbers);
-     hoverSetting.style.display = showNumbers ? 'flex' : 'none';
-     if (!showNumbers) {
-         hoverNumbersToggle.checked = false;
-         document.body.classList.remove('numbers-on-hover');
-     } else {
-         document.body.classList.toggle('numbers-on-hover', hoverNumbersToggle.checked);
-     }
+
+
+    document.body.classList.toggle('numbers-hidden', !showNumbers);
 }
 
 export function setInitialSliderValues(diskCount, towerCount) {

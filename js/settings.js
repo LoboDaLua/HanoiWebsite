@@ -36,7 +36,7 @@ export function saveSettings() {
         volume: parseInt(ui.volumeControl.value),
         darkMode: ui.darkModeToggle.checked,
         showNumbers: ui.showNumbersToggle.checked,
-        hoverNumbers: ui.hoverNumbersToggle.checked,
+        // hoverNumbers removed
         numDisks: parseInt(ui.diskCountInput.value),
         numTowers: parseInt(ui.towerCountInput.value)
     };
@@ -54,7 +54,7 @@ export function loadSettings() {
             ui.volumeControl.value = settings.volume !== undefined ? settings.volume : 75;
             ui.darkModeToggle.checked = settings.darkMode !== undefined ? settings.darkMode : false;
             ui.showNumbersToggle.checked = settings.showNumbers !== undefined ? settings.showNumbers : false;
-            ui.hoverNumbersToggle.checked = settings.hoverNumbers !== undefined ? settings.hoverNumbers : false;
+            // hoverNumbersToggle removed
 
             // Update state variables based on loaded settings
             state.setSoundEnabled(ui.soundToggle.checked);
@@ -140,10 +140,7 @@ export function setupSettingsEventListeners() {
         saveSettings();
     });
 
-    ui.hoverNumbersToggle.addEventListener('change', () => {
-        document.body.classList.toggle('numbers-on-hover', ui.hoverNumbersToggle.checked);
-        saveSettings();
-    });
+    // hoverNumbersToggle event listener removed
 
     ui.diskCountInput.addEventListener('input', (e) => {
         ui.diskCountValue.textContent = e.target.value;
