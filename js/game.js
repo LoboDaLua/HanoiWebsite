@@ -69,7 +69,9 @@ export function initGame() {
 let selectedSourceTower = null;
 
 function clearTowerSelection() {
-    document.querySelectorAll('.tower').forEach(tower => tower.classList.remove('selected-tower'));
+    document.querySelectorAll('.tower').forEach(tower => {
+        tower.classList.remove('selected-tower', 'move-preview-valid', 'move-preview-invalid');
+    });
     selectedSourceTower = null;
 }
 
@@ -83,6 +85,7 @@ function handleTowerSelect(towerIndex) {
         }
         selectedSourceTower = towerIndex;
         document.querySelector(`.tower[data-tower-id='${towerIndex}']`).classList.add('selected-tower');
+        updateTopDiskClasses();
         ui.setGameStateLabel(`Selected Tower ${towerIndex + 1} as source.`);
         audio.playSound(() => audio.popSound.triggerAttackRelease('C4', '8n'));
     } else {
@@ -118,15 +121,40 @@ function handleTowerSelect(towerIndex) {
             audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
         }
         clearTowerSelection();
+        updateTopDiskClasses();
         settings.saveSettings();
     }
 }
 
 function addTowerClickListeners() {
     document.querySelectorAll('.tower').forEach(tower => {
-        tower.addEventListener('click', (e) => {
-            const towerIndex = parseInt(tower.dataset.towerId);
+        const towerIndex = parseInt(tower.dataset.towerId);
+
+        tower.addEventListener('click', () => {
             handleTowerSelect(towerIndex);
+        });
+
+        // Mouse hover feedback
+        tower.addEventListener('mouseenter', () => {
+            if (selectedSourceTower === null) {
+                tower.classList.add('hovered');
+            } else if (selectedSourceTower !== null && selectedSourceTower !== towerIndex) {
+                // Move preview state
+                tower.classList.remove('hovered');
+                if (isValidMove(selectedSourceTower, towerIndex)) {
+                    tower.classList.add('move-preview-valid');
+                    tower.classList.remove('move-preview-invalid');
+                } else {
+                    tower.classList.add('move-preview-invalid');
+                    tower.classList.remove('move-preview-valid');
+                    // Play error sound for invalid preview
+                    audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+                }
+            }
+        });
+
+        tower.addEventListener('mouseleave', () => {
+            tower.classList.remove('hovered', 'move-preview-valid', 'move-preview-invalid');
         });
     });
 }
@@ -171,6 +199,16 @@ function handleKeyPress(e) {
     if (isNaN(key) || key < 1 || key > state.numTowers) return;
     const towerIndex = key - 1;
     handleTowerSelect(towerIndex);
+}
+
+function updateTopDiskClasses() {
+    document.querySelectorAll('.tower').forEach(tower => {
+        const disks = tower.querySelectorAll('.disk');
+        disks.forEach(disk => disk.classList.remove('top-disk'));
+        if (disks.length > 0) {
+            disks[disks.length - 1].classList.add('top-disk');
+        }
+    });
 }
 
 
