@@ -1,18 +1,20 @@
 # Tower of Hanoi Web Game
 
-A web-based implementation of the classic Tower of Hanoi puzzle, built with HTML, CSS, and JavaScript.
+A modern web-based Tower of Hanoi puzzle built with HTML, CSS, and JavaScript.
 
 ## Features
 
-- Interactive drag-and-drop gameplay
 - Keyboard controls for picking up and placing disks (using number keys 1, 2, 3...)
 - Customizable number of disks and towers (via settings menu)
 - Sound effects for moves and winning (requires Tone.js)
 - Dark mode toggle
-- Option to show/hide disk numbers
+- Option to show/hide disk numbers (always on or always off)
 - Settings persistence using browser cookies
-- Game state label providing descriptive feedback for actions.
+- Game state label providing descriptive feedback for actions
 - Timer and move counter
+- Multi-layered visual feedback for tower selection and move previews
+
+**Note:** Drag-and-drop and disk hover effects have been removed. All interaction is via clicking towers or using the keyboard.
 
 ## Technologies Used
 
@@ -46,13 +48,17 @@ You can easily run this project locally using Python's built-in HTTP server.
 
 ## How to Play
 
-- **Drag and Drop:** Click and drag the top disk from a tower to another tower. Only smaller disks can be placed on larger ones.
-- **Keyboard Controls:**
-  - Press a number key (1, 2, 3, ...) to pick up the top disk from that tower.
-  - Press another number key to place the disk on the chosen tower.
+- **Click or Keyboard:** Click towers or use number keys (1, 2, 3, ...) to select a source and then a destination tower. Only smaller disks can be placed on larger ones.
 - **Game State Label:**
   Located below the game area, this label provides feedback on your actions, such as selecting a disk, attempting a move, or winning the game.
 - **Settings:**
   Click the hamburger menu (top right) to open settings. Here you can adjust sound, dark mode, disk number display, and the number of disks/towers. Settings are saved automatically to your browser's cookies.
 - **Reset:**
   Use the "Reset" button for a quick reset, or "Apply and Reset" in the settings menu to change disk/tower count and restart.
+
+## Accessibility & Feedback
+
+- Towers are fully keyboard accessible (focusable and operable via number keys).
+- Visual feedback is provided for hover, selection, and move preview states.
+- Disk numbers are always visible or always hidden, based on the toggle in settings.
+- No disk hover or drag-and-drop interaction is present.
