@@ -147,8 +147,7 @@ function addTowerClickListeners() {
                 } else {
                     tower.classList.add('move-preview-invalid');
                     tower.classList.remove('move-preview-valid');
-                    // Play error sound for invalid preview
-                    audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+                    // Intentionally no sound for invalid move preview to avoid audio spam
                 }
             }
         });
