@@ -22,14 +22,10 @@ export function initGame() {
     stopTimer();
     ui.setTimerDisplay('00', '00');
     ui.gameArea.innerHTML = '';
-    // Removed hideTooltip()
-    ui.setGameStateLabel('Make a move to start the game.'); // Initial message
+    ui.setGameStateLabel('Select a source tower.'); // Initial message
 
-    // Clear any lingering keyboard selection
-    if (state.selectedDiskByKey) {
-        state.selectedDiskByKey.element.classList.remove('selected-by-key');
-        state.setSelectedDiskByKey(null);
-    }
+    // Clear any lingering selection
+    clearTowerSelection();
 
     // Create towers
     const newTowers = [];
@@ -37,6 +33,7 @@ export function initGame() {
         const towerEl = document.createElement('div');
         towerEl.classList.add('tower');
         towerEl.dataset.towerId = i;
+        towerEl.tabIndex = 0; // Make towers focusable for accessibility
         ui.gameArea.appendChild(towerEl);
         newTowers.push([]);
     }
@@ -51,7 +48,7 @@ export function initGame() {
         diskEl.dataset.diskId = i;
         diskEl.style.width = `${width}px`;
         diskEl.style.backgroundColor = `hsl(${(i * 360 / state.numDisks)}, 70%, 50%)`;
-        diskEl.draggable = true;
+        // No drag events needed for unified scheme
 
         const numberSpan = document.createElement('span');
         numberSpan.classList.add('disk-number');
@@ -63,63 +60,75 @@ export function initGame() {
     }
 
     ui.updateUI(state.numDisks, state.numTowers, state.moves);
-    addDragDropListeners(); // Re-add listeners after game area is cleared and rebuilt
+    addTowerClickListeners();
 }
 
 
-// --- Drag and Drop Logic ---
-function handleDragStart(e) {
-    const towerEl = e.target.parentElement;
-    if (e.target === towerEl.lastChild) {
-        audio.playSound(() => audio.popSound.triggerAttackRelease('C4', '8n'));
-        state.setDraggedDisk({ id: parseInt(e.target.dataset.diskId), element: e.target });
-        state.setSourceTower({ id: parseInt(towerEl.dataset.towerId), element: towerEl });
-        setTimeout(() => e.target.classList.add('dragging'), 0);
-        ui.setGameStateLabel(`Dragging disk ${state.draggedDisk.id} from Tower ${state.sourceTower.id + 1}.`); // Update label on drag start
-    } else {
-        e.preventDefault();
-        ui.setGameStateLabel('Only the top disk can be moved.'); // Update label for invalid drag start
-    }
+
+// --- Unified Tower-to-Tower Control Logic ---
+let selectedSourceTower = null;
+
+function clearTowerSelection() {
+    document.querySelectorAll('.tower').forEach(tower => tower.classList.remove('selected-tower'));
+    selectedSourceTower = null;
 }
 
-function handleDragEnd(e) {
-    if(state.draggedDisk) state.draggedDisk.element.classList.remove('dragging');
-    state.setDraggedDisk(null);
-    state.setSourceTower(null);
-    // Label updated on drop or invalid drop
-}
-
-function handleDragOver(e) { e.preventDefault(); }
-
-function handleDrop(e) {
-    e.preventDefault();
-    if (!state.draggedDisk) return;
-    const targetTowerEl = e.target.closest('.tower');
-    if (!targetTowerEl) {
-        ui.setGameStateLabel('Invalid drop location.'); // Update label for dropping outside towers
-        audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
-        return;
-    }
-    const targetTowerId = parseInt(targetTowerEl.dataset.towerId);
-
-    if (isValidMove(state.sourceTower.id, targetTowerId)) {
-        audio.playSound(() => audio.popSound.triggerAttackRelease('G3', '8n'));
-        if (!state.timerStarted) {
-            startTimer();
-            state.setTimerStarted(true);
+function handleTowerSelect(towerIndex) {
+    if (selectedSourceTower === null) {
+        // Select source tower
+        if (state.towers[towerIndex].length === 0) {
+            ui.setGameStateLabel(`Tower ${towerIndex + 1} is empty.`);
+            audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+            return;
         }
-        state.towers[state.sourceTower.id].pop();
-        state.towers[targetTowerId].push(state.draggedDisk.id);
-        targetTowerEl.appendChild(state.draggedDisk.element);
-        state.setMoves(state.moves + 1);
-        ui.updateUI(state.numDisks, state.numTowers, state.moves);
-        checkWinCondition();
-        ui.setGameStateLabel(`Moved disk ${state.draggedDisk.id} from Tower ${state.sourceTower.id + 1} to Tower ${targetTowerId + 1}.`); // Update label on successful drop
+        selectedSourceTower = towerIndex;
+        document.querySelector(`.tower[data-tower-id='${towerIndex}']`).classList.add('selected-tower');
+        ui.setGameStateLabel(`Selected Tower ${towerIndex + 1} as source.`);
+        audio.playSound(() => audio.popSound.triggerAttackRelease('C4', '8n'));
     } else {
-         ui.setGameStateLabel(`Invalid move to Tower ${targetTowerId + 1}.`); // Update label for invalid drop
-         audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+        // Select destination tower and attempt move
+        const fromId = selectedSourceTower;
+        const toId = towerIndex;
+        if (fromId === toId) {
+            ui.setGameStateLabel('Cannot move to the same tower.');
+            audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+            clearTowerSelection();
+            return;
+        }
+        const diskToMove = state.towers[fromId][state.towers[fromId].length - 1];
+        const topDiskOnTarget = state.towers[toId][state.towers[toId].length - 1];
+        if (state.towers[toId].length === 0 || diskToMove < topDiskOnTarget) {
+            // Valid move
+            audio.playSound(() => audio.popSound.triggerAttackRelease('G3', '8n'));
+            if (!state.timerStarted) {
+                startTimer();
+                state.setTimerStarted(true);
+            }
+            state.towers[fromId].pop();
+            state.towers[toId].push(diskToMove);
+            // Move DOM element
+            const diskEl = document.querySelector(`.tower[data-tower-id='${fromId}']`).lastChild;
+            document.querySelector(`.tower[data-tower-id='${toId}']`).appendChild(diskEl);
+            state.setMoves(state.moves + 1);
+            ui.updateUI(state.numDisks, state.numTowers, state.moves);
+            checkWinCondition();
+            ui.setGameStateLabel(`Moved disk from Tower ${fromId + 1} to Tower ${toId + 1}.`);
+        } else {
+            ui.setGameStateLabel(`Invalid move to Tower ${toId + 1}.`);
+            audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
+        }
+        clearTowerSelection();
+        settings.saveSettings();
     }
-    // Removed settings.saveSettings() here to avoid unnecessary saves on every move
+}
+
+function addTowerClickListeners() {
+    document.querySelectorAll('.tower').forEach(tower => {
+        tower.addEventListener('click', (e) => {
+            const towerIndex = parseInt(tower.dataset.towerId);
+            handleTowerSelect(towerIndex);
+        });
+    });
 }
 
 function isValidMove(fromId, toId) {
@@ -147,10 +156,12 @@ function checkWinCondition() {
             return;
         }
     }
-     // If not a win, set label back to waiting for selection if no disk is selected
-     if (!state.selectedDiskByKey) {
-         ui.setGameStateLabel('Waiting for selection.');
-     }
+    // If not a win, prompt for next move
+    if (selectedSourceTower === null) {
+        ui.setGameStateLabel('Select a source tower.');
+    } else {
+        ui.setGameStateLabel('Select a destination tower.');
+    }
 }
 
 // --- Keyboard Controls ---
@@ -158,90 +169,13 @@ function handleKeyPress(e) {
     const key = parseInt(e.key);
     // Only handle number keys corresponding to towers
     if (isNaN(key) || key < 1 || key > state.numTowers) return;
-
     const towerIndex = key - 1;
-
-    if (state.selectedDiskByKey) {
-        // --- Try to place the disk ---
-        const sourceTowerId = state.selectedDiskByKey.sourceTowerId;
-
-        if (isValidMove(sourceTowerId, towerIndex)) {
-            ui.setGameStateLabel(`Moved disk from Tower ${sourceTowerId + 1} to Tower ${towerIndex + 1}.`); // Update game state label
-            audio.playSound(() => audio.popSound.triggerAttackRelease('G3', '8n'));
-            if (!state.timerStarted) {
-                startTimer();
-                state.setTimerStarted(true);
-            }
-
-            // Move data
-            state.towers[sourceTowerId].pop();
-            state.towers[towerIndex].push(state.selectedDiskByKey.id);
-
-            // Move DOM element
-            const targetTowerEl = document.querySelector(`.tower[data-tower-id='${towerIndex}']`);
-            targetTowerEl.appendChild(state.selectedDiskByKey.element);
-
-            state.setMoves(state.moves + 1);
-            ui.updateUI(state.numDisks, state.numTowers, state.moves);
-            checkWinCondition(); // checkWinCondition will update label if win or waiting
-        } else {
-            ui.setGameStateLabel(`Invalid move to Tower ${towerIndex + 1}.`); // Update game state label
-            audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
-             // Keep disk selected on invalid move via keyboard
-             return; // Don't deselect on invalid keyboard move
-        }
-
-        // Deselect disk on successful move via keyboard
-        state.selectedDiskByKey.element.classList.remove('selected-by-key');
-        state.setSelectedDiskByKey(null);
-        settings.saveSettings(); // Save settings after a keyboard move
-
-    } else {
-        // --- Try to pick up a disk ---
-        if (state.towers[towerIndex].length > 0) {
-            ui.setGameStateLabel(`Selected disk from Tower ${towerIndex + 1}.`); // Update game state label
-            audio.playSound(() => audio.popSound.triggerAttackRelease('C4', '8n'));
-            const sourceTowerEl = document.querySelector(`.tower[data-tower-id='${towerIndex}']`);
-            const diskEl = sourceTowerEl.lastChild;
-            const diskId = parseInt(diskEl.dataset.diskId);
-
-            state.setSelectedDiskByKey({
-                id: diskId,
-                element: diskEl,
-                sourceTowerId: towerIndex
-            });
-
-            diskEl.classList.add('selected-by-key');
-        } else {
-             ui.setGameStateLabel(`Tower ${towerIndex + 1} is empty.`); // Update game state label
-             audio.playSound(() => audio.errorSound.triggerAttackRelease('A2', '16n'));
-        }
-    }
+    handleTowerSelect(towerIndex);
 }
 
 
-// --- Event Listeners ---
-function addDragDropListeners() {
-    // Remove existing listeners to prevent duplicates when initGame is called
-    document.querySelectorAll('.disk').forEach(disk => {
-        disk.removeEventListener('dragstart', handleDragStart);
-        disk.removeEventListener('dragend', handleDragEnd);
-    });
-     document.querySelectorAll('.tower').forEach(tower => {
-        tower.removeEventListener('dragover', handleDragOver);
-        tower.removeEventListener('drop', handleDrop);
-    });
 
-    // Add new listeners
-    document.querySelectorAll('.disk').forEach(disk => {
-        disk.addEventListener('dragstart', handleDragStart);
-        disk.addEventListener('dragend', handleDragEnd);
-    });
-    document.querySelectorAll('.tower').forEach(tower => {
-        tower.addEventListener('dragover', handleDragOver);
-        tower.addEventListener('drop', handleDrop);
-    });
-}
+// No drag and drop listeners needed for unified scheme
 
 export function resetGameAndCloseMenus() {
     document.body.classList.remove('menu-open');
