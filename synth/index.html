@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Synthesizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div id="app-container">
+        <div id="controls-container">
+            <div id="control-panel" class="p-4 shadow-lg border-b-2 border-gray-700">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                     <div class="module p-4 rounded-lg flex flex-col items-center">
+                        <h3 class="text-lg font-bold mb-3 text-center border-b border-gray-600 pb-2 w-full">Synth Presets</h3>
+                        <div class="w-full space-y-3 mt-2">
+                            <select id="preset-select" class="bg-gray-600 text-white rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"></select>
+                            <button id="save-preset-button" class="w-full text-white font-bold py-2 px-4 rounded-md">Save Preset</button>
+                        </div>
+                    </div>
+
+                    <div class="module p-4 rounded-lg flex flex-col items-center">
+                         <h3 class="text-lg font-bold mb-3 text-center border-b border-gray-600 pb-2 w-full">Master & Wave</h3>
+                         <div class="slider-container mt-2">
+                            <div class="slider-track" data-parameter="volume" data-min="0" data-max="1" data-value="0.8"><div class="slider-pointer"></div></div>
+                            <label class="text-sm font-medium">Volume</label>
+                        </div>
+                         <div class="flex items-center justify-center space-x-2 mt-4">
+                            <select id="waveform" class="bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                <option value="sine">Sine</option> <option value="square">Square</option> <option value="sawtooth">Sawtooth</option> <option value="triangle">Triangle</option>
+                                <option value="fatsawtooth">Fat Saw</option> <option value="fatsquare">Fat Square</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="module p-4 rounded-lg">
+                        <h3 class="text-lg font-bold mb-3 text-center border-b border-gray-600 pb-2">ADSR Envelope</h3>
+                        <div class="grid grid-cols-4 gap-2 mt-2">
+                            <div class="slider-container"><div class="slider-track" data-parameter="attack" data-min="0.01" data-max="2" data-value="0.1"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Attack</label></div>
+                            <div class="slider-container"><div class="slider-track" data-parameter="decay" data-min="0.01" data-max="2" data-value="0.2"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Decay</label></div>
+                            <div class="slider-container"><div class="slider-track" data-parameter="sustain" data-min="0.01" data-max="1" data-value="0.5"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Sustain</label></div>
+                            <div class="slider-container"><div class="slider-track" data-parameter="release" data-min="0.01" data-max="5" data-value="1"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Release</label></div>
+                        </div>
+                    </div>
+
+                    <div class="module p-4 rounded-lg">
+                        <h3 class="text-lg font-bold mb-3 text-center border-b border-gray-600 pb-2">Effects</h3>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="slider-container"><div class="slider-track" data-parameter="reverb" data-min="0" data-max="1" data-value="0.2"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Reverb</label></div>
+                            <div class="slider-container"><div class="slider-track" data-parameter="delay" data-min="0" data-max="1" data-value="0.1"><div class="slider-pointer"></div></div><label class="text-sm font-medium">Delay</label></div>
+                        </div>
+                    </div>
+
+                    <div class="module p-4 rounded-lg flex flex-col items-center">
+                        <h3 class="text-lg font-bold mb-3 text-center border-b border-gray-600 pb-2 w-full">Visualizer</h3>
+                        <div class="slider-container mt-2">
+                            <div class="slider-track" data-parameter="viz_rate" data-min="0.5" data-max="8" data-value="3.0"><div class="slider-pointer"></div></div>
+                            <label class="text-sm font-medium">Rate</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800 text-center py-1">
+                 <button id="toggle-controls-btn" class="text-white font-bold text-xs">Hide Controls</button>
+            </div>
+        </div>
+
+        <div id="main-content">
+            <div id="piano-roll-container">
+                 <div id="notes-wrapper"></div>
+            </div>
+            <div id="keyboard-area" class="p-2">
+                <div id="keyboard-container" class="flex items-center">
+                    <div id="keyboard" class="relative flex h-32"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="start-prompt" class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <button id="start-button" class="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg text-2xl hover:bg-blue-600 transition-colors">Click to Start</button>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

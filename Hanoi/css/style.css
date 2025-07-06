@@ -1,0 +1,501 @@
+/* --- General Setup & Theming --- */
+:root {
+    --tower-width: 10px;
+    --tower-height: 200px;
+    --disk-height: 20px;
+    --base-width: 250px;
+    --background-color: #f0f2f5;
+    --tower-color: #333;
+    --text-color: #2c3e50;
+    --panel-bg: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --border-color: #ccc;
+    --disk-border-color: rgba(0, 0, 0, 0.1);
+    --button-color: #e74c3c;
+    --switch-bg-color: #ccc;
+    --switch-active-bg-color: #2ecc71;
+    --key-select-color: #f1c40f;
+}
+
+body[data-theme="dark"] {
+    --background-color: #1a1a1a;
+    --tower-color: #ccc;
+    --text-color: #f0f2f5;
+    --panel-bg: #2c3e50;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --border-color: #555;
+    --disk-border-color: rgba(255, 255, 255, 0.15);
+    --switch-bg-color: #555;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- Game Layout --- */
+h1 {
+    margin-bottom: 20px;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.info-panel,
+.game-area,
+.settings-menu,
+.win-message-content {
+    background-color: var(--panel-bg);
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.info-panel {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.info-box {
+    text-align: center;
+    padding: 0 15px;
+    margin-bottom: 10px;
+}
+
+.info-box h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+    color: #7f8c8d;
+}
+
+body[data-theme="dark"] .info-box h2 {
+    color: #bdc3c7;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.game-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    width: 100%;
+    height: calc(var(--tower-height) + 50px);
+    padding: 20px;
+}
+
+/* --- Towers and Disks --- */
+.tower {
+    position: relative;
+    width: var(--base-width);
+    height: var(--tower-height);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    border-bottom: var(--tower-width) solid var(--tower-color);
+    transition: box-shadow 0.2s;
+}
+
+.tower::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: var(--tower-width);
+    height: 100%;
+    background-color: var(--tower-color);
+    border-radius: 5px 5px 0 0;
+}
+
+.disk {
+    position: relative;
+    z-index: 1;
+    height: var(--disk-height);
+    border-radius: 10px;
+    /* cursor: grab; removed */
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 0;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.disk.selected-by-key {
+    border-color: var(--key-select-color);
+    transform: scale(1.05);
+}
+
+.disk-number {
+    transition: opacity 0.2s;
+}
+
+body.numbers-hidden .disk-number {
+    display: none;
+}
+
+
+
+/* --- Tooltip --- */
+
+
+.game-state-label {
+    display: block;
+    margin: 16px 0 0 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--text-color); /* Use text-color or tooltip-text-color */
+    background: var(--panel-bg); /* Use panel-bg or tooltip-bg-color */
+    border-radius: var(--border-radius);
+    padding: 8px 16px;
+    box-shadow: var(--shadow);
+    min-height: 1.5em;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+}
+
+
+/* --- Buttons --- */
+.button {
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+/* --- Settings Menu --- */
+.menu-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    background: var(--panel-bg);
+    border: none;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hamburger {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-color);
+    display: block;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-color);
+    display: block;
+    position: absolute;
+    transition: all 0.3s;
+}
+
+.hamburger::before {
+    top: -8px;
+}
+
+.hamburger::after {
+    bottom: -8px;
+}
+
+.menu-open .hamburger {
+    background-color: transparent;
+}
+
+.menu-open .hamburger::before {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.menu-open .hamburger::after {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+.settings-menu {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100%;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+    padding: 80px 20px 20px;
+    overflow-y: auto;
+}
+
+.menu-open .settings-menu {
+    right: 0;
+}
+
+.settings-menu h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--background-color);
+}
+
+.settings-menu hr {
+    border: none;
+    border-top: 2px solid var(--background-color);
+    margin: 20px 0;
+}
+
+.setting {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.setting>label:first-of-type {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.setting-slider {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.setting label span {
+    font-weight: normal;
+    background-color: var(--background-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+#hover-setting,
+#volume-setting {
+    display: none;
+}
+
+#reset-btn {
+    width: 100%;
+}
+
+/* --- Toggle Switch Styles --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--switch-bg-color);
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--switch-active-bg-color);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--switch-active-bg-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 28px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- Win Message & Responsive --- */
+.win-message {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    text-align: center;
+}
+
+.win-message-content {
+    padding: 40px 60px;
+}
+
+.win-message h2 {
+    font-size: 3em;
+    color: #2ecc71;
+    margin: 0 0 20px 0;
+}
+
+@media (max-width: 768px) {
+    .info-panel {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game-area {
+        flex-direction: column;
+        height: auto;
+        align-items: center;
+    }
+
+    .tower {
+        width: 90%;
+        margin-bottom: 40px;
+        height: 180px;
+    }
+
+    .tower:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* --- Tower Hover & Selection Feedback --- */
+.tower {
+    position: relative;
+    width: var(--base-width);
+    height: var(--tower-height);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    border-bottom: var(--tower-width) solid var(--tower-color);
+    transition: box-shadow 0.2s;
+}
+
+.tower .disk.top-disk {
+    /* Used for hover/selection/move preview */
+    z-index: 2;
+    transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+}
+
+/* Hover State (Mouse Only) */
+.tower.hovered .disk.top-disk {
+    transform: translateY(-12px);
+}
+.tower.hovered::after {
+    content: '';
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    bottom: -8px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-color);
+    opacity: 0.5;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+/* Selection State (Source Tower) */
+.tower.selected-tower .disk.top-disk {
+    transform: translateY(-28px) scale(1.08);
+    border: 3px solid var(--key-select-color);
+    box-shadow: 0 0 0 4px rgba(241,196,15,0.2);
+}
+.tower.selected-tower::after {
+    content: '';
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: -10px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--key-select-color);
+    opacity: 0.9;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+/* Move Preview State (Destination Tower) */
+.tower.move-preview-valid::after,
+.tower.move-preview-invalid::after {
+    content: '';
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: -10px;
+    height: 6px;
+    border-radius: 3px;
+    opacity: 1;
+    transition: background 0.2s;
+}
+.tower.move-preview-valid::after {
+    background: #2ecc71;
+    box-shadow: 0 0 8px 2px #2ecc7188;
+}
+.tower.move-preview-invalid::after {
+    background: #e74c3c;
+    box-shadow: 0 0 8px 2px #e74c3c88;
+}
